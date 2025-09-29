@@ -1,1 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>AI Brain - Search & Reason</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        input, select, button { padding: 10px; margin: 5px 0; width: 300px; }
+        #output { margin-top: 20px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>AI Brain - Search & Logical Reasoning</h1>
+    <select id="mode">
+        <option value="search">Basic Search</option>
+        <option value="reason">Logical Reasoning</option>
+    </select><br/>
+    <input type="text" id="query" placeholder="Enter your query here" />
+    <button onclick="sendQuery()">Ask</button>
 
+    <div id="output"></div>
+
+    <script>
+        async function sendQuery() {
+            const query = document.getElementById('query').value.trim();
+            const mode = document.getElementById('mode').value;
+            if (!query) {
+                alert('Please enter a query.');
+                return;
+            }
+
+            document.getElementById('output').textContent = 'Processing...';
+
+            const response = await fetch('/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query, mode })
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                document.getElementById('output').textContent = 'Error: ' + data.error;
+                return;
+            }
+
+            if (data.type === 'search') {
+                document.getElementById('output').textContent = data.results.join('\n\n');
+            } else if (data.type === 'reason') {
+                document.getElementById('output').textContent = data.answer;
+            }
+        }
+    </script>
+</body>
+</html>
